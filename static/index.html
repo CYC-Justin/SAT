@@ -24,8 +24,11 @@
       <td>ID</td>
       <td width="100px">Name</td>
     </tr>
-   
   </table>
+  <input type="text" id="id"/>
+  <input type="text" id="name"/>
+  <button id="submit">Add</button>
+  <button id="delete">Delete</button>
 </body>
 <script>
   console.log("Hello World");
@@ -41,10 +44,51 @@
     })
     .catch(error => console.error('Error:', error));
 
-  fetch('http://127.0.0.1:8000/add/');
+  document.getElementById('submit').addEventListener('click', () => {
+    console.log(document.getElementById('id').value)
+    console.log(document.getElementById('name').value)
+
+    fetch('http://127.0.0.1:8000/add/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: document.getElementById('id').value,
+        name: document.getElementById('name').value
+      })
+    })
     .then(response => response.json())
-    .then()
-    .catch()
+    .then(data => {
+      console.log('Success:', data);
+      // 刷新页面或重新加载数据
+      location.reload();
+    })
+    .catch(error => console.error('Error:', error));
+  });
+  
+  document.getElementById('delete').addEventListener('click', () => {
+    fetch('http://127.0.0.1:8000/delete/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: document.getElementById('id').value,
+        name: document.getElementById('name').value
+      })
+    })
+      
+      .then(response => response.json())    
+      .then(data => {
+      console.log('Success:', data);
+      // 刷新页面或重新加载数据
+      location.reload();
+    })
+    .catch(error => console.error('Error:', error));
+  });
+
+  
 </script>
 
 </html>

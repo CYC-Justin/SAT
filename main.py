@@ -85,6 +85,7 @@ async def add_value(value: add_list):
 
 @app.post("/delete/")
 async def delete_value(value: delete_list):
+    print("aaaaa",value)
     cursor.execute("DELETE FROM justin.todolist WHERE id = %s AND name = %s", (value.id, value.name))
     conn.commit()
     return {"message": "删除成功", "id": value.id, "name": value.name}
