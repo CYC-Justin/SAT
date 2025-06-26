@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <title>To Do List</title>
+  <link rel="stylesheet" href="css/index.css">
+  <style>
+    table,
+    th,
+    td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+
+<body>
+  <table id="table">
+    <tr>
+      <th width="100px">To Do List</th>
+    </tr>
+    <tr>
+      <td>ID</td>
+      <td width="100px">Name</td>
+    </tr>
+   
+  </table>
+</body>
+<script>
+  console.log("Hello World");
+  fetch('http://127.0.0.1:8000/get/')
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+      data.forEach(item => {
+        const row = document.createElement('tr')
+        row.innerHTML = `<td>${item.id}</td><td>${item.name}</td>`
+        document.getElementById('table').appendChild(row)
+      })
+    })
+    .catch(error => console.error('Error:', error));
+
+  fetch('http://127.0.0.1:8000/add/');
+    .then(response => response.json())
+    .then()
+    .catch()
+</script>
+
+</html>
