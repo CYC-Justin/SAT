@@ -61,6 +61,10 @@ class delete_list(BaseModel):
     id: str
     name: str
 
+class update_list(BaseModel):
+    id: str
+    name: str
+
 # GET 路由
 # @app.<method>("路由路径")
 # async def 处理函数():
@@ -85,10 +89,25 @@ async def add_value(value: add_list):
 
 @app.post("/delete/")
 async def delete_value(value: delete_list):
-    print("aaaaa",value)
     cursor.execute("DELETE FROM justin.todolist WHERE id = %s AND name = %s", (value.id, value.name))
     conn.commit()
     return {"message": "删除成功", "id": value.id, "name": value.name}
+
+@app.post("/update/")
+async def update_value(value: update_list):
+    # 当前逻辑：根据 ID 更新 name
+    # 如果你需要同时更新 ID 和 name，可以使用下面的 SQL：
+    # cursor.execute("UPDATE justin.todolist SET id = %s, name = %s WHERE id = %s", (value.id, value.name, value.id))
+    
+    cursor.execute("UPDATE justin.todolist SET name = %s WHERE id = %s", (value.name, value.id))
+    conn.commit()
+    
+    # 检查是否有记录被更新
+    if cursor.rowcount == 0:
+        return {"message": "更新失败", "error": f"ID '{value.id}' 不存在", "id": value.id}
+    else:
+        return {"message": "更新成功", "id": value.id, "name": value.name}
+
 
 # 挂载静态文件目录，将根路径 "/" 映射到 static 文件夹，html=True 表示支持 HTML 文件
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
