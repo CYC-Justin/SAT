@@ -11,6 +11,7 @@ cursor = conn.cursor(cursor_factory=RealDictCursor)
 
 
 def get_records():
+    
     cursor.execute("SELECT * FROM justin.todolist")
     records = cursor.fetchall()
     return records
