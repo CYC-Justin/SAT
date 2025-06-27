@@ -19,79 +19,103 @@
   <table id="table">
     <tr>
       <th width="100px">To Do List</th>
+      <input type="text" id="search_id" />
+      <input type="text" id="search_name" />
+      <button id="search">Search</button>
     </tr>
     <tr>
-      <td>ID</td>
+      <td></td>
+      <td width="100px">ID</td>
       <td width="100px">Name</td>
-      <td width="100px">操作</td>
     </tr>
+
   </table>
-  <input type="text" id="id"/>
-  <input type="text" id="name"/>
+  <input type="text" id="id" />
+  <input type="text" id="name" />
   <button id="submit">Add</button>
   <br>
-  <input type="text" id="id_update"/>
-  <input type="text" id="name_update"/>
+  <input type="text" id="id_update" />
+  <input type="text" id="name_update" />
   <button id="update">Update</button>
 </body>
 <script>
   console.log("Hello World");
-  fetch('http://127.0.0.1:8000/get/')
-    .then(response => response.json())
-    .then(data => {
-      console.log(data)
-      data.forEach(item => {
-        const row = document.createElement('tr')
-        row.innerHTML = `
+  // 获取数据
+  function get_data() {
+    // 清空表格，保留表头
+    const table = document.getElementById('table');
+    const rows = table.querySelectorAll('tr');
+    // 删除除了前两行（表头）之外的所有行
+    for (let i = rows.length - 1; i >= 2; i--) {
+      rows[i].remove();
+    }
+    
+    fetch('http://127.0.0.1:8000/get/')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        // 清空表格
+
+        data.forEach(item => {
+          const row = document.createElement('tr')
+          row.innerHTML = `
           <td>${item.id}</td>
           <td>${item.name}</td>
           <td>
             <button class="delete" data-id="${item.id}" data-name="${item.name}">Delete</button>
           </td>
         `
-        document.getElementById('table').appendChild(row)
+          document.getElementById('table').appendChild(row)
+        })
+        delete_data()
+
       })
-      
-      // 为所有删除按钮添加事件监听器
-      document.querySelectorAll('.delete').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const id = this.getAttribute('data-id')
-          const name = this.getAttribute('data-name')
-          
-          if (confirm(`确定要删除 "${id}"和"${name}" 吗？`)) {
-            fetch('http://127.0.0.1:8000/delete/', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                id: id,
-                name: name
-              })
+      .catch(error => console.error('Error:', error));
+  }
+
+  // 为所有删除按钮添加事件监听器
+  function delete_data() {
+    document.querySelectorAll('.delete').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const id = this.getAttribute('data-id')
+        const name = this.getAttribute('data-name')
+
+        if (confirm(`确定要删除 "${id}"和"${name}" 吗？`)) {
+          fetch('http://127.0.0.1:8000/delete/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: id,
+              name: name
             })
-            .then(response => response.json())    
+          })
+            .then(response => response.json())
             .then(data => {
               console.log('Success:', data);
               // 只删除当前行，而不是刷新整个页面
               this.closest('tr').remove()
             })
             .catch(error => console.error('Error:', error));
-          }
-        })
+        }
       })
     })
-    .catch(error => console.error('Error:', error));
+  }
+  
+  // 第一次进入画面拿资料
+  get_data()
 
   document.getElementById('submit').addEventListener('click', () => {
     const id_add = document.getElementById('id').value.trim();
     const name_add = document.getElementById('name').value.trim();
-    
+
     // 检查id和name是否为空
     if (!id_add || !name_add) {
       alert('ID和Name不能为空');
       return;
     }
-    
+
     console.log(id_add);
     console.log(name_add);
 
@@ -101,38 +125,47 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: idValue,
-        name: nameValue
+        id: id_add,
+        name: name_add
       })
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
-      // 刷新页面或重新加载数据
-      location.reload();
-    })
-    .catch(error => console.error('Error:', error));
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+        alert(data.message);
+        // 刷新页面或重新加载数据
+        //添加成功重新拿资料
+        get_data()
+      })
+      .catch(error => console.error('Error:', error));
   });
-  
+
 
   document.getElementById('update').addEventListener('click', () => {
     fetch('http://127.0.0.1:8000/update/', {
       method: 'POST',
       headers: {
-                'Content-Type': 'application/json',
-              },
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         id: document.getElementById('id_update').value,
         name: document.getElementById('name_update').value
-          })
+      })
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
-      location.reload();
-    })
-    .catch(error => console.error('Error:', error));
-
+      .then(response => response.json())
+      .then(data => {
+        if (data.message == '更新成功') {
+          console.log('Success:', data);
+          alert(data.message);
+        //更新成功重新拿资料
+        get_data()
+        }
+        else{
+          alert(data.message);
+        }
+        // location.reload();
+      })
+      .catch(error => console.error('Error:', error));
   })
 </script>
 

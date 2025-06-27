@@ -11,7 +11,7 @@ cursor = conn.cursor(cursor_factory=RealDictCursor)
 
 
 def get_records():
-    
+
     cursor.execute("SELECT * FROM justin.todolist")
     records = cursor.fetchall()
     return records
@@ -109,6 +109,8 @@ async def update_value(value: update_list):
     else:
         return {"message": "更新成功", "id": value.id, "name": value.name}
 
+
+    
 
 # 挂载静态文件目录，将根路径 "/" 映射到 static 文件夹，html=True 表示支持 HTML 文件
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
