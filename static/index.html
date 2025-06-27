@@ -23,12 +23,12 @@
     <tr>
       <td>ID</td>
       <td width="100px">Name</td>
+      <td width="100px">操作</td>
     </tr>
   </table>
   <input type="text" id="id"/>
   <input type="text" id="name"/>
   <button id="submit">Add</button>
-  <button id="delete">Delete</button>
 </body>
 <script>
   console.log("Hello World");
@@ -38,8 +38,42 @@
       console.log(data)
       data.forEach(item => {
         const row = document.createElement('tr')
-        row.innerHTML = `<td>${item.id}</td><td>${item.name}</td>`
+        row.innerHTML = `
+          <td>${item.id}</td>
+          <td>${item.name}</td>
+          <td>
+            <button class="delete" data-id="${item.id}" data-name="${item.name}">Delete</button>
+          </td>
+        `
         document.getElementById('table').appendChild(row)
+      })
+      
+      // 为所有删除按钮添加事件监听器
+      document.querySelectorAll('.delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const id = this.getAttribute('data-id')
+          const name = this.getAttribute('data-name')
+          
+          if (confirm(`确定要删除 "${id}"和"${name}" 吗？`)) {
+            fetch('http://127.0.0.1:8000/delete/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                id: id,
+                name: name
+              })
+            })
+            .then(response => response.json())    
+            .then(data => {
+              console.log('Success:', data);
+              // 只删除当前行，而不是刷新整个页面
+              this.closest('tr').remove()
+            })
+            .catch(error => console.error('Error:', error));
+          }
+        })
       })
     })
     .catch(error => console.error('Error:', error));
@@ -66,28 +100,6 @@
     })
     .catch(error => console.error('Error:', error));
   });
-  
-  document.getElementById('delete').addEventListener('click', () => {
-    fetch('http://127.0.0.1:8000/delete/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: document.getElementById('id').value,
-        name: document.getElementById('name').value
-      })
-    })
-      
-      .then(response => response.json())    
-      .then(data => {
-      console.log('Success:', data);
-      // 刷新页面或重新加载数据
-      location.reload();
-    })
-    .catch(error => console.error('Error:', error));
-  });
-
   
 </script>
 
