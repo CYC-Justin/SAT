@@ -39,7 +39,7 @@
   <button id="update">Update</button>
 </body>
 <script>
-  console.log("Hello World");
+
   // 获取数据
   function get_data() {
     // 清空表格，保留表头
@@ -49,14 +49,15 @@
     for (let i = rows.length - 1; i >= 2; i--) {
       rows[i].remove();
     }
-    
-    fetch('http://127.0.0.1:8000/get/')
+    const params = new URLSearchParams();
+    params.append("id", document.getElementById('search_id').value);
+    params.append("name", document.getElementById('search_name').value);
+
+    fetch(`http://127.0.0.1:8000/get/?${params}`)
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         // 清空表格
-
-        data.forEach(item => {
+        data.records.forEach(item => {
           const row = document.createElement('tr')
           row.innerHTML = `
           <td>${item.id}</td>
@@ -72,6 +73,14 @@
       })
       .catch(error => console.error('Error:', error));
   }
+
+  // 第一次进入画面拿资料
+  get_data()
+
+  // 搜索按钮
+  document.getElementById('search').addEventListener('click', () => {
+    get_data()
+  })
 
   // 为所有删除按钮添加事件监听器
   function delete_data() {
@@ -102,23 +111,15 @@
       })
     })
   }
-  
-  // 第一次进入画面拿资料
-  get_data()
 
   document.getElementById('submit').addEventListener('click', () => {
     const id_add = document.getElementById('id').value.trim();
     const name_add = document.getElementById('name').value.trim();
-
     // 检查id和name是否为空
     if (!id_add || !name_add) {
       alert('ID和Name不能为空');
       return;
     }
-
-    console.log(id_add);
-    console.log(name_add);
-
     fetch('http://127.0.0.1:8000/add/', {
       method: 'POST',
       headers: {
@@ -140,7 +141,6 @@
       .catch(error => console.error('Error:', error));
   });
 
-
   document.getElementById('update').addEventListener('click', () => {
     fetch('http://127.0.0.1:8000/update/', {
       method: 'POST',
@@ -157,16 +157,18 @@
         if (data.message == '更新成功') {
           console.log('Success:', data);
           alert(data.message);
-        //更新成功重新拿资料
-        get_data()
+          //更新成功重新拿资料
+          get_data()
         }
-        else{
+        else {
           alert(data.message);
         }
         // location.reload();
       })
       .catch(error => console.error('Error:', error));
   })
+
+
 </script>
 
 </html>
