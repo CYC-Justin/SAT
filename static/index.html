@@ -61,6 +61,9 @@
     fetch(`http://127.0.0.1:8000/get/?${params}`)
       .then(response => response.json())
       .then(data => {
+        // 按ID从小到大排序
+        data.records.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        
         // 清空表格
         data.records.forEach(item => {
           const row = document.createElement('tr')
