@@ -58,8 +58,11 @@
     for (let i = rows.length - 1; i >= 1; i--) {
       rows[i].remove();
     }
+    // 创建URLSearchParams对象，用于构建HTTP请求的查询参数
     const params = new URLSearchParams();
+    // 从ID搜索输入框获取用户输入的值，并添加为"id"查询参数
     params.append("id", document.getElementById('search_id').value);
+    // 从名称搜索输入框获取用户输入的值，并添加为"name"查询参数
     params.append("name", document.getElementById('search_name').value);
 
     fetch(`http://127.0.0.1:8000/get/?${params}`)
