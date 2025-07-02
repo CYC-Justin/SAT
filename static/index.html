@@ -75,6 +75,30 @@
             <button class="delete-btn" data-id="${item.id}" data-name="${item.name}">🗑️</button>
           </td>
         `
+          // 添加行点击事件，点击后跳转到update区域并填充数据
+          row.style.cursor = 'pointer'
+          row.addEventListener('click', function(e) {
+            // 如果点击的是删除按钮，不触发行点击事件
+            if (e.target.classList.contains('delete-btn')) {
+              return
+            }
+            
+            // 填充update输入框
+            document.getElementById('id_update').value = item.id
+            document.getElementById('name_update').value = item.name
+            
+            // 滚动到update区域
+            document.querySelector('.update-section').scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'center'
+            })
+            
+            // 聚焦到name输入框
+            setTimeout(() => {
+              document.getElementById('name_update').focus()
+            }, 500)
+          })
+          
           document.getElementById('table').appendChild(row)
         })
         delete_data()
