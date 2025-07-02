@@ -14,14 +14,14 @@
 <body>
   <div class="todo-container">
     <h2>To Do List</h2>
-    
+
     <!-- 搜索区域移到表格外面 -->
     <div class="search-section">
       <input type="text" id="search_id" class="search-input" placeholder="Search by ID">
       <input type="text" id="search_name" class="search-input" placeholder="Search by Name">
       <button id="search" class="search-btn">🔍</button>
     </div>
-    
+
     <div class="todo-item">
       <table id="table">
         <tr>
@@ -31,19 +31,12 @@
         </tr>
       </table>
     </div>
-    
-    <!-- 添加区域 -->
-    <div class="add-section">
-      <input type="text" id="id" placeholder="输入ID" />
-      <input type="text" id="name" placeholder="输入名称" />
-      <button id="submit" class="add-btn">+</button>
-    </div>
-    
-    <!-- 更新区域 -->
-    <div class="update-section">
-      <input type="text" id="id_update" placeholder="更新ID" />
-      <input type="text" id="name_update" placeholder="更新名称" />
-      <button id="update" class="update-btn">🔄</button>
+
+
+    <div class="smart-input-section">
+      <input type="text" id="smart_id" placeholder="输入ID" />
+      <input type="text" id="smart_name" placeholder="输入名称" />
+      <button id="smart_btn" class="smart-btn" data-mode="add">+</button>
     </div>
   </div>
 </body>
@@ -78,30 +71,18 @@
             <button class="delete-btn" data-id="${item.id}" data-name="${item.name}">🗑️</button>
           </td>
         `
-          // 添加行点击事件，点击后跳转到update区域并填充数据
+          // 添加行点击事件，实现智能选择功能
           row.style.cursor = 'pointer'
-          row.addEventListener('click', function(e) {
+          row.addEventListener('click', function (e) {
             // 如果点击的是删除按钮，不触发行点击事件
             if (e.target.classList.contains('delete-btn')) {
               return
             }
-            
-            // 填充update输入框
-            document.getElementById('id_update').value = item.id
-            document.getElementById('name_update').value = item.name
-            
-            // 滚动到update区域
-            document.querySelector('.update-section').scrollIntoView({ 
-              behavior: 'smooth',
-              block: 'center'
-            })
-            
-            // 聚焦到name输入框
-            setTimeout(() => {
-              document.getElementById('name_update').focus()
-            }, 500)
+
+            // 调用智能行选择函数
+            handleRowSelection(this, item)
           })
-          
+
           document.getElementById('table').appendChild(row)
         })
         delete_data()
@@ -148,61 +129,136 @@
     })
   }
 
-  document.getElementById('submit').addEventListener('click', () => {
-    const id_add = document.getElementById('id').value.trim();
-    const name_add = document.getElementById('name').value.trim();
-    // 检查id和name是否为空
-    if (!id_add || !name_add) {
+  // 智能输入状态管理
+  let currentSelectedRow = null;
+  let currentMode = 'add';
+
+  // 智能行选择处理函数
+  // currentSelectedRow会记住你选的第一次选的行数
+  function handleRowSelection(clickedRow, item) {
+    // 如果点击的是当前选中的行，则取消选择
+    if (currentSelectedRow === clickedRow) {
+      // 取消选择
+      resetToAddMode();
+      return;
+    }
+
+    // 移除之前选中行的高亮
+    if (currentSelectedRow) {
+      currentSelectedRow.classList.remove('selected');
+    }
+
+    // 设置新的选中行
+    currentSelectedRow = clickedRow;
+    clickedRow.classList.add('selected');
+
+    // 切换到更新模式
+    switchToUpdateMode(item);
+  }
+
+  // 切换到更新模式
+  function switchToUpdateMode(item) {
+    currentMode = 'update';
+
+    // 填充输入框
+    document.getElementById('smart_id').value = item.id;
+    document.getElementById('smart_name').value = item.name;
+
+    // 更新按钮
+    const smartBtn = document.getElementById('smart_btn');
+    smartBtn.textContent = '🔄';
+    smartBtn.setAttribute('data-mode', 'update');
+
+    // 滚动到输入区域并聚焦
+    document.querySelector('.smart-input-section').scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    setTimeout(() => {
+      document.getElementById('smart_name').focus();
+    }, 300);
+  }
+
+  // 重置到添加模式
+  function resetToAddMode() {
+    currentMode = 'add';
+
+    // 移除选中行高亮
+    if (currentSelectedRow) {
+      currentSelectedRow.classList.remove('selected');
+      currentSelectedRow = null;
+    }
+
+    // 清空输入框
+    document.getElementById('smart_id').value = '';
+    document.getElementById('smart_name').value = '';
+
+    // 更新按钮
+    const smartBtn = document.getElementById('smart_btn');
+    smartBtn.textContent = '+';
+    smartBtn.setAttribute('data-mode', 'add');
+  }
+
+  // 智能按钮事件监听器
+  document.getElementById('smart_btn').addEventListener('click', () => {
+    const id_value = document.getElementById('smart_id').value.trim();
+    const name_value = document.getElementById('smart_name').value.trim();
+
+    // 检查输入是否为空
+    if (!id_value || !name_value) {
       alert('ID和Name不能为空');
       return;
     }
-    fetch('http://127.0.0.1:8000/add/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: id_add,
-        name: name_add
-      })
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-        alert(data.message);
-        // 刷新页面或重新加载数据
-        //添加成功重新拿资料
-        get_data()
-      })
-      .catch(error => console.error('Error:', error));
-  });
 
-  document.getElementById('update').addEventListener('click', () => {
-    fetch('http://127.0.0.1:8000/update/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: document.getElementById('id_update').value,
-        name: document.getElementById('name_update').value
+    if (currentMode === 'add') {
+      // 执行添加操作
+      fetch('http://127.0.0.1:8000/add/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: id_value,
+          name: name_value
+        })
       })
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.message == '更新成功') {
+        .then(response => response.json())
+        .then(data => {
           console.log('Success:', data);
           alert(data.message);
-          //更新成功重新拿资料
-          get_data()
-        }
-        else {
-          alert(data.message);
-        }
-        // location.reload();
+          // 清空输入框并重新加载数据
+          resetToAddMode();
+          get_data();
+        })
+        .catch(error => console.error('Error:', error));
+    } else if (currentMode === 'update') {
+      // 执行更新操作
+      fetch('http://127.0.0.1:8000/update/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: id_value,
+          name: name_value
+        })
       })
-      .catch(error => console.error('Error:', error));
-  })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message == '更新成功') {
+            console.log('Success:', data);
+            alert(data.message);
+            // 重置到添加模式并重新加载数据
+            resetToAddMode();
+            get_data();
+          } else {
+            alert(data.message);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  });
 
 
 </script>

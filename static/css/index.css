@@ -91,16 +91,15 @@ body {
   background-color: white;
 }
 
-.add-section,
-.update-section {
+/* 智能输入区域样式 */
+.smart-input-section {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
   align-items: center;
 }
 
-.add-section input,
-.update-section input {
+.smart-input-section input {
   flex: 1;
   padding: 10px;
   border: 2px solid #e2e8f0;
@@ -110,39 +109,78 @@ body {
   transition: border-color 0.2s;
 }
 
-.add-section input:focus,
-.update-section input:focus {
+.smart-input-section input:focus {
   border-color: #667eea;
 }
 
-.add-btn {
+/* 智能按钮 - 根据模式动态切换样式 */
+.smart-btn {
   padding: 10px 15px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 50px;
+}
+
+/* 添加模式样式 */
+.smart-btn[data-mode="add"] {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s;
 }
 
-.add-btn:hover {
+.smart-btn[data-mode="add"]:hover {
   transform: scale(1.05);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
-.update-btn {
-  padding: 10px 15px;
+/* 更新模式样式 */
+.smart-btn[data-mode="update"] {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.smart-btn[data-mode="update"]:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+/* 取消按钮样式 */
+.cancel-btn {
+  padding: 10px 15px;
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: transform 0.2s;
 }
 
-.update-btn:hover {
+.cancel-btn:hover {
   transform: scale(1.05);
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+}
+
+/* 表格行高亮样式 */
+.todo-item tr {
+  transition: background-color 0.2s ease;
+}
+
+.todo-item tr:hover {
+  background-color: #f8fafc !important;
+}
+
+/* 选中行高亮样式 */
+.todo-item tr.selected {
+  background-color: #e0f2fe !important;
+  border-left: 4px solid #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.todo-item tr.selected td {
+  background-color: transparent;
+  font-weight: 500;
 }
 
 .delete-btn {
