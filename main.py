@@ -20,7 +20,7 @@ def get_records(id: Optional[str] = None, name: Optional[str] = None):
         cursor.execute("SELECT * FROM justin.todolist WHERE id = %s", (id,))
     elif name:
         # 只搜索 name
-        cursor.execute("SELECT * FROM justin.todolist WHERE name = %s", (name,))
+        cursor.execute("SELECT * FROM justin.todolist WHERE name ILIKE %s", (f"%{name}%",))
     else:
         # 没有搜索条件，返回所有记录
         cursor.execute("SELECT * FROM justin.todolist")
