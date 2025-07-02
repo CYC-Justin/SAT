@@ -3,40 +3,49 @@
 <html>
 
 <head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <title>To Do List</title>
   <link rel="stylesheet" href="css/index.css">
-  <style>
-    table,
-    th,
-    td {
-      border: 1px solid black;
-      border-collapse: collapse;
-    }
-  </style>
+
 </head>
 
 <body>
-  <table id="table">
-    <tr>
-      <th width="100px">To Do List</th>
-      <input type="text" id="search_id" />
-      <input type="text" id="search_name" />
-      <button id="search">Search</button>
-    </tr>
-    <tr>
-      <td></td>
-      <td width="100px">ID</td>
-      <td width="100px">Name</td>
-    </tr>
-
-  </table>
-  <input type="text" id="id" />
-  <input type="text" id="name" />
-  <button id="submit">Add</button>
-  <br>
-  <input type="text" id="id_update" />
-  <input type="text" id="name_update" />
-  <button id="update">Update</button>
+  <div class="todo-container">
+    <h2>To Do List</h2>
+    
+    <!-- 搜索区域移到表格外面 -->
+    <div class="search-section">
+      <input type="text" id="search_id" class="search-input" placeholder="Search by ID">
+      <input type="text" id="search_name" class="search-input" placeholder="Search by Name">
+      <button id="search" class="search-btn">🔍</button>
+    </div>
+    
+    <div class="todo-item">
+      <table id="table">
+        <tr>
+          <th width="100px">ID</th>
+          <th width="100px">Name</th>
+          <th width="100px">Delete</th>
+        </tr>
+      </table>
+    </div>
+    
+    <!-- 添加区域 -->
+    <div class="add-section">
+      <input type="text" id="id" placeholder="输入ID" />
+      <input type="text" id="name" placeholder="输入名称" />
+      <button id="submit" class="add-btn">+</button>
+    </div>
+    
+    <!-- 更新区域 -->
+    <div class="update-section">
+      <input type="text" id="id_update" placeholder="更新ID" />
+      <input type="text" id="name_update" placeholder="更新名称" />
+      <button id="update" class="update-btn">🔄</button>
+    </div>
+  </div>
 </body>
 <script>
 
@@ -45,8 +54,8 @@
     // 清空表格，保留表头
     const table = document.getElementById('table');
     const rows = table.querySelectorAll('tr');
-    // 删除除了前两行（表头）之外的所有行
-    for (let i = rows.length - 1; i >= 2; i--) {
+    // 删除除了第一行（表头）之外的所有行
+    for (let i = rows.length - 1; i >= 1; i--) {
       rows[i].remove();
     }
     const params = new URLSearchParams();
@@ -63,7 +72,7 @@
           <td>${item.id}</td>
           <td>${item.name}</td>
           <td>
-            <button class="delete" data-id="${item.id}" data-name="${item.name}">Delete</button>
+            <button class="delete-btn" data-id="${item.id}" data-name="${item.name}">🗑️</button>
           </td>
         `
           document.getElementById('table').appendChild(row)
@@ -82,9 +91,9 @@
     get_data()
   })
 
-  // 为所有删除按钮添加事件监听器
+  // 为所有删除按钮添加事件监听器 - 修复选择器
   function delete_data() {
-    document.querySelectorAll('.delete').forEach(btn => {
+    document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', function () {
         const id = this.getAttribute('data-id')
         const name = this.getAttribute('data-name')
